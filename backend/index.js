@@ -42,6 +42,7 @@ app.post("/login", async (req, res) => {
   db.query(sql, [username], async (err, result) => {
     if (err || result.length === 0) {
       console.log("Error Searching for username: " + err);
+      res.status(404).json({ message: "No username found" });
     } else {
       //compare hashed password
       const match = await bcrypt.compare(password, result[0].password);
@@ -57,6 +58,26 @@ app.post("/login", async (req, res) => {
     }
   });
 });
+
+//Authentication Middlware using JWT
+const authenticate = (req, res, next) => {
+  const token = req.header("Authorization");
+  console.log("Unextracted Token" + token);
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  const extractedToken = token.split(" ")[1];
+  console.log("Actual Token: " + extractedToken);
+
+  try {
+    // Verify and Validate our token
+    const decoded = jwt.verify(extractedToken, "my_secret_key");
+    req.userId = decoded.userId;
+    next();
+  } catch (err) {
+    res.status(401).json({ message: "Invalid Token" });
+  }
+};
 
 // PORT
 const port = 5500;
