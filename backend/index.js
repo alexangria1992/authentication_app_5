@@ -79,6 +79,18 @@ const authenticate = (req, res, next) => {
   }
 };
 
+app.get("/profile", authenticate, (req, res) => {
+  const userId = req.userid;
+  const sql = "SELECT * FROM users WHERE id = ?";
+  db.query(sql, [userId], (err, result) => {
+    if (err || result.length === 0) {
+      res.status(500).json({ message: "Error fetching Details" });
+    } else {
+      res.json({ username: result[0].username });
+    }
+  });
+});
+
 // PORT
 const port = 5500;
 app.listen(port, () => {
