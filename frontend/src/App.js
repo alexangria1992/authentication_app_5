@@ -28,9 +28,14 @@ const App = () => {
   useEffect(() => {
     authenticate();
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setLoggedIn(false);
+  };
   return (
     <BrowserRouter>
-      <Navbar />
+      <Navbar loggedIn={loggedIn} handleLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
