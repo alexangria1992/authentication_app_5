@@ -27,6 +27,37 @@ app.post("/register", async (req, res) => {
   });
 });
 
+//LOGIN Endpoint
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  //Check if username and password are present
+  if (!username || !password) {
+    return res
+      .statusMessage(400)
+      .json({ message: "Username and Password are required" });
+  }
+
+  //Query
+  const sql = "SELECT * FROM users WHERE username = ?";
+  db.query(sql, [username], async (err, result) => {
+    if (err || result.length === 0) {
+      console.log("Error Searching for username: " + err);
+    } else {
+      //compare hashed password
+      const match = await bcrypt.compare(password, result[0].password);
+      if (match) {
+        //create a jwt token
+        const token = jwt.sign({ userId: result[0].id }, "my_secret_key", {
+          expiresIn: "1h",
+        });
+        res.json({ message: "Login Successful", token });
+      } else {
+        res.status(401).json({ message: "Invalid Password" });
+      }
+    }
+  });
+});
+
 // PORT
 const port = 5500;
 app.listen(port, () => {
