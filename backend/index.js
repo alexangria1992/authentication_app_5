@@ -80,7 +80,7 @@ const authenticate = (req, res, next) => {
 };
 
 app.get("/profile", authenticate, (req, res) => {
-  const userId = req.userid;
+  const userId = req.userId;
   const sql = "SELECT * FROM users WHERE id = ?";
   db.query(sql, [userId], (err, result) => {
     if (err || result.length === 0) {
@@ -91,6 +91,17 @@ app.get("/profile", authenticate, (req, res) => {
   });
 });
 
+//Product List Endpoint
+app.get("/products", (req, res) => {
+  const sql = "SELECT * FROM  products";
+  db.query(sql, (err, result) => {
+    if (err) {
+      res.status(500).json({ message: "Error fetching Products" });
+    } else {
+      res.json(result);
+    }
+  });
+});
 // PORT
 const port = 5500;
 app.listen(port, () => {
