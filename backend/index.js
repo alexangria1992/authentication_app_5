@@ -33,7 +33,7 @@ app.post("/login", async (req, res) => {
   //Check if username and password are present
   if (!username || !password) {
     return res
-      .statusMessage(400)
+      .status(400)
       .json({ message: "Username and Password are required" });
   }
 
